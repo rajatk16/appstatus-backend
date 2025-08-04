@@ -1,9 +1,7 @@
 import { z } from "zod";
 
 export const createMonitorSchema = z.object({
-  name: z.string().trim().optional().refine(val => val === undefined || val.length > 0, {
-    message: "Name, if provided, must be at least 1 character long"
-  }),
+  name: z.string().trim().min(1, { message: "Name, if provided, must be at least 1 character long" }).optional(),
   url: z.url({
     message: "Please provide a valid URL (e.g. https://www.example.com)"
   }),
