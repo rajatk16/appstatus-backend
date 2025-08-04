@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 export const createMonitorSchema = z.object({
-  name: z.string().min(1),
+  name: z.string().min(1).trim().optional(),
   url: z.url({
     message: "Invalid URL"
   }),
