@@ -1,8 +1,14 @@
 import fastify from "fastify";
 
+import prismaPlugin from "./plugins/prisma";
+import monitorRoutes from "./routes/monitor";
+
 const app = fastify({
   logger: true,
 });
+
+app.register(prismaPlugin);
+app.register(monitorRoutes, { prefix: "/api" });
 
 app.get("/", async () => {
   return {
