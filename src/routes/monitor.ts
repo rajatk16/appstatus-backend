@@ -35,7 +35,7 @@ const monitorRoutes: FastifyPluginAsync = async (fastify) => {
   fastify.get("/monitors/:id", async (req, reply) => {
     const { id } = req.params as { id: string };
     const monitor = await fastify.prisma.monitor.findUnique({
-      where: { id }
+      where: { id, userId: "a33f2c7f-d650-4b2d-bdaf-1cd77f8a8184" }
     });
     if (!monitor) {
       return reply.code(404).send({ error: "Monitor not found" });
@@ -47,17 +47,29 @@ const monitorRoutes: FastifyPluginAsync = async (fastify) => {
     const { id } = req.params as { id: string };
     const updateSchema = createMonitorSchema.partial();
     const updates = updateSchema.parse(req.body);
-    const monitor = await fastify.prisma.monitor.update({
-      where: { id },
+    const monitor = await fastify.prisma.monitor.findUnique({
+      where: { id, userId: "a33f2c7f-d650-4b2d-bdaf-1cd77f8a8184" }
+    });
+    if (!monitor) {
+      return reply.code(404).send({ error: "Monitor not found" });
+    }
+    const updatedMonitor = await fastify.prisma.monitor.update({
+      where: { id, userId: "a33f2c7f-d650-4b2d-bdaf-1cd77f8a8184" },
       data: updates
     });
-    return reply.send(monitor);
+    return reply.send(updatedMonitor);
   });
 
   fastify.delete("/monitors/:id", async (req, reply) => {
     const { id } = req.params as { id: string };
+    const monitor = await fastify.prisma.monitor.findUnique({
+      where: { id, userId: "a33f2c7f-d650-4b2d-bdaf-1cd77f8a8184" }
+    });
+    if (!monitor) {
+      return reply.code(404).send({ error: "Monitor not found" });
+    }
     await fastify.prisma.monitor.delete({
-      where: { id }
+      where: { id, userId: "a33f2c7f-d650-4b2d-bdaf-1cd77f8a8184" }
     });
     return reply.code(204).send();
   });

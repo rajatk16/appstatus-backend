@@ -10,3 +10,6 @@ coverage
 
 # Build output
 dist
+
+# Request HTTP
+requests.http
