@@ -1,3 +1,9 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
 generator client {
   provider = "prisma-client-js"
 }
@@ -7,38 +13,64 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum HttpMethod {
+  GET
+  POST
+  PUT
+  DELETE
+  PATCH
+  HEAD
+}
+
+enum MonitorStatus {
+  UP
+  DOWN
+  UNKNOWN
+}
+
 model User {
-  id        String    @id @default(uuid())
+  id        String    @id @default(cuid())
   email     String    @unique
   password  String
-  firstName String?
-  lastName  String?
+  monitors  Monitor[]
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
-  monitors  Monitor[]
 }
 
 model Monitor {
-  id          String       @id @default(uuid())
-  userId      String
-  url         String
-  name        String?
-  interval    Int
-  isActive    Boolean      @default(true)
-  lastStatus  String?
-  lastChecked DateTime?
-  createdAt   DateTime     @default(now())
-  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
-  logs        MonitorLog[]
+  id             String          @id @default(cuid())
+  name           String
+  url            String
+  method         HttpMethod      @default(GET)
+  expectedStatus Int?
+  interval       Int
+  nextCheckAt    DateTime
+  status         MonitorStatus   @default(UNKNOWN)
+  lastCheckedAt  DateTime?
+  user           User            @relation(fields: [userId], references: [id])
+  userId         String
+  results        MonitorResult[]
+  alertConfig    AlertConfig?
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
 }
 
-model MonitorLog {
-  id           String   @id @default(uuid())
-  monitorId    String
-  statusCode   Int?
-  responseTime Int?
-  success      Boolean
-  error        String?
-  checkedAt    DateTime @default(now())
-  monitor      Monitor  @relation(fields: [monitorId], references: [id], onDelete: Cascade)
+model MonitorResult {
+  id         String        @id @default(cuid())
+  monitor    Monitor       @relation(fields: [monitorId], references: [id])
+  monitorId  String
+  status     MonitorStatus
+  httpStatus Int?
+  responseMs Int?
+  checkedAt  DateTime      @default(now())
+  error      String?
+}
+
+model AlertConfig {
+  id         String   @id @default(cuid())
+  monitor    Monitor  @relation(fields: [monitorId], references: [id])
+  monitorId  String   @unique
+  email      String?
+  webhookUrl String?
+  createdAt  DateTime @default(now())
 }
