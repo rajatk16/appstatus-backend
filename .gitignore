@@ -13,3 +13,4 @@ dist
 
 # Request HTTP
 requests.http
+/src/generated/prisma
