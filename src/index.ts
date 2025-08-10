@@ -1,7 +1,7 @@
 import Fastify from 'fastify';
 
-import { authRoutes, healthRoute } from './routes';
 import { jwtPlugin, prismaPlugin } from './plugins';
+import { authRoutes, healthRoute, monitorRoutes } from './routes';
 
 const buildServer = () => {
   const app = Fastify({
@@ -15,6 +15,7 @@ const buildServer = () => {
   // Routes
   app.register(authRoutes, { prefix: '/auth' });
   app.register(healthRoute, { prefix: '/health' });
+  app.register(monitorRoutes, { prefix: '/monitors' });
 
   return app;
 };

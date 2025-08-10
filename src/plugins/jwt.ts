@@ -6,7 +6,7 @@ export const jwtPlugin = fastifyPlugin(async fastify => {
     secret: process.env.JWT_SECRET || 'YOUR_JWT_SECRET',
   });
 
-  fastify.decorate('authenticate', async (request, reply) => {
+  fastify.decorate('authenticate', async (request: any, reply: any) => {
     try {
       await request.jwtVerify();
     } catch (err) {
@@ -14,3 +14,22 @@ export const jwtPlugin = fastifyPlugin(async fastify => {
     }
   });
 });
+
+declare module 'fastify' {
+  interface FastifyInstance {
+    authenticate: any;
+  }
+}
+
+declare module '@fastify/jwt' {
+  interface FastifyJWT {
+    payload: {
+      id: string;
+      email: string;
+    };
+    user: {
+      id: string;
+      email: string;
+    };
+  }
+}
